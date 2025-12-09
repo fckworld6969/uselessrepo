@@ -71,7 +71,12 @@ download_url_to() {
     "$DOWNLOAD_HELPER" "$url" "$outname" "$outdir" && return 0 || echo "helper failed, falling back"
   fi
   if has_cmd aria2c; then
-    aria2c -x 16 -s 16 -o "${outdir}/${outname:-$(basename "$url")}" "$url" && return 0 || true
+    if [ -n "$outname" ]; then
+      aria2c -x 16 -s 16 -d "$outdir" -o "$outname" "$url" && return 0 || true
+    else
+      # Let aria2c pick the filename from Content-Disposition when no outname provided
+      aria2c -x 16 -s 16 -d "$outdir" --content-disposition "$url" && return 0 || true
+    fi
   fi
   if has_cmd curl; then
     if [ -n "$outname" ]; then
@@ -118,6 +123,13 @@ if [ "$SKIP_CUSTOM" -eq 0 ]; then
     "https://github.com/willmiao/ComfyUI-Lora-Manager.git"
     "https://github.com/Smirnov75/ComfyUI-mxToolkit.git"
     "https://github.com/liusida/ComfyUI-AutoCropFaces.git"
+    "https://github.com/kijai/ComfyUI-KJNodes"
+    "https://github.com/ltdrdata/was-node-suite-comfyui"
+    "https://github.com/teward/ComfyUI-Helper-Nodes"
+    "https://github.com/kaaskoek232/IPAdapterWAN"
+    "https://github.com/rslosch/comfyui-nodesweet"
+    "https://github.com/ltdrdata/ComfyUI-Impact-Subpack"
+    "https://github.com/ltdrdata/was-node-suite-comfyui"
   )
   for r in "${repos[@]}"; do
     name="$(basename "$r" .git)"
@@ -166,7 +178,7 @@ if [ "$SKIP_CIVITAI" -eq 0 ]; then
   else
     # List of civitai downloads: model_id|out_subdir|out_name
     civlist=(
-      "1820829|models/checkpoints|Wan2.2_I2V_A14B.gguf"
+      "2060527|models/checkpoints|Wan2.2_I2V_A14B.gguf"
       "2303105|models/loras|WAN_DR34ML4Y_All-In-One_NSFW_high.safetensors"
       "2303113|models/loras|WAN_DR34ML4Y_All-In-One_NSFW_low.safetensors"
       "2342652|models/loras|WAN_2.2_I2V_POV_Paizuri_Titfuck_high.safetensors"
