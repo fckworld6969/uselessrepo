@@ -33,13 +33,11 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-# Choose destination: prefer a mounted volume, fall back to container ComfyUI path
+# Choose destination: default to local container ComfyUI path
+# In local GPU-only setups there is no network volume mounted, so
+# prefer the container path by default. Use `--dest` to override.
 if [ -z "$DEST" ]; then
-  if [ -d "/runpod-volume/ComfyUI" ]; then
-    DEST="/runpod-volume/ComfyUI"
-  else
-    DEST="/workspace/runpod-slim/ComfyUI"
-  fi
+  DEST="/workspace/runpod-slim/ComfyUI"
 fi
 
 echo "Preparing ComfyUI content at: $DEST"
@@ -79,7 +77,11 @@ download_url_to() {
     if [ -n "$outname" ]; then
       curl -L -o "$outdir/$outname" "$url" && return 0 || true
     else
-      curl -L -O -J -P "$outdir" "$url" && return 0 || true
+      # When no explicit output name is provided we want the remote filename
+      # (possibly from Content-Disposition). Change directory to the destination
+      # so curl -O / -J writes the file into the correct folder instead of
+      # the current working directory.
+      (cd "$outdir" && curl -L -J -O "$url") && return 0 || true
     fi
   fi
   if has_cmd wget; then
@@ -141,6 +143,7 @@ if [ "$SKIP_WAN" -eq 0 ]; then
   HF_BASE="https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files"
   files=(
     "diffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors|models/diffusion_models"
+    "diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors|models/diffusion_models"
     "vae/wan_2.1_vae.safetensors|models/vae"
     "loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors|models/loras"
     "loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors|models/loras"
