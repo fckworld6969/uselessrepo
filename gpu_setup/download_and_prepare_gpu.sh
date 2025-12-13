@@ -156,6 +156,8 @@ if [ "$SKIP_WAN" -eq 0 ]; then
   files=(
     "diffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors|models/diffusion_models"
     "diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors|models/diffusion_models"
+    "diffusion_models/wan2.2_i2v_low_noise_14B_fp16.safetensors|models/diffusion_models"
+    "diffusion_models/wan2.2_i2v_high_noise_14B_fp16.safetensors|models/diffusion_models"
     "vae/wan_2.1_vae.safetensors|models/vae"
     "loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors|models/loras"
     "loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors|models/loras"
@@ -214,4 +216,3 @@ du -sh "$DEST/custom_nodes" || true
 echo "Done. Restart ComfyUI to pick up new custom nodes/models (or re-link volume)."
 
 exit 0
-
