@@ -214,3 +214,4 @@ du -sh "$DEST/custom_nodes" || true
 echo "Done. Restart ComfyUI to pick up new custom nodes/models (or re-link volume)."
 
 exit 0
+
